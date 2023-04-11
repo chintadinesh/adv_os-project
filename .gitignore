@@ -1,0 +1,6 @@
+test_bin/test_debug
+test_obj/test_debug.o
+test_obj/*
+test_bin/*
+bin/*
+obj/*
