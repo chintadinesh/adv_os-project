@@ -4,3 +4,7 @@ test_obj/*
 test_bin/*
 bin/*
 obj/*
+tmp/*
+log/*
+gmon.out
+thumb/*

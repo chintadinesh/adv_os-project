@@ -4,13 +4,13 @@ $(info ~~~~~~~~~~~~)
 
 ifeq ($(DEBUG),)
     # Define a default value for VARNAME if not defined
-    DEBUG = 1
+    DEBUG = 3
 endif
 
 CC = gcc
 LDD = gcc
 
-CFLAGS = -Wextra -O0 -DOPTDEBUG=$(DEBUG) -g 
+CFLAGS = -Wextra -DFWRITE -O0 -DOPTDEBUG=$(DEBUG) -pg 
 #CFLAGS = -Wextra -O0
 SCFLAGS =-fPIC -DOPTDEBUG =$(DEBUG) 
 
@@ -21,7 +21,7 @@ LDFLAGS=
 
 #TEST_CFLAGS=-Wextra -O0 -DOPTDEBUG -g 
 #TEST_CFLAGS=-DOPTDEBUG -Wextra -O0 -g 
-TEST_CFLAGS=-Wextra -O0 -DOPTDEBUG=$(DEBUG)
+TEST_CFLAGS=-Wextra -O0 -DOPTDEBUG=$(DEBUG) -pg
 
 #TEST_LDFLAGS=-Ttext=0x0800000
 #TEST_LDFLAGS=-Wextra -O0 -DOPTDEBUG -g -static 
@@ -84,7 +84,7 @@ $(TEST_BIN_DIR)/%: $(LIBS) $(TEST_OBJ_DIR)/%.o
 	$(LDD) $(TEST_LDFLAGS) $(TEST_CFLAGS) -I$(INC_DIR) -o $@ $^ -L/usr/lib -lc -lm
 
 $(BIN_DIR)/%: $(LIBS) $(OBJ_DIR)/%.o 
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(INC_DIR) -o $@ $^ 
+	$(CC) $(CFLAGS) $(LDFLAGS) -I$(INC_DIR) -o $@ $^ -luring 
 
 $(LIB_DIR)/%.o: $(SRC_DIR)/%.c 
 	$(CC) $(CFLAGS) -I$(INC_DIR) -c -o $@ $<

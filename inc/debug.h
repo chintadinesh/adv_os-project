@@ -31,7 +31,8 @@
     struct tm *local_time = localtime(&current_time); \
     char time_str[64]; \
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", local_time);\
-    printf("DEBUG: [%s.%ld ms] %s:%s:%d: " fmt, time_str, milliseconds, __func__, __FILE__, __LINE__, ##__VA_ARGS__); \
+    fprintf(stderr, "DEBUG: [%s.%ld ms] %s:%s:%d: " \
+            fmt, time_str, milliseconds, __func__, __FILE__, __LINE__, ##__VA_ARGS__); \
 } while (0)
 #else
     #define DEBUG(fmt, args...) do {} while (0)

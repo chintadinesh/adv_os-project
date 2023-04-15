@@ -15,8 +15,12 @@
 * */
 #include <linux/io_uring.h>
 
-#define QUEUE_DEPTH 1
-#define BLOCK_SZ    1024
+#include "debug.h"
+
+//#define QUEUE_DEPTH 1
+//#define BLOCK_SZ    1024
+#define BLOCK_SZ   1024 * 32
+#define QUEUE_DEPTH 16
 
 /* This is x86 specific */
 #define read_barrier()  __asm__ __volatile__("":::"memory")
@@ -59,12 +63,14 @@ struct file_info {
 
 int io_uring_setup(unsigned entries, struct io_uring_params *p)
 {
+    DEBUG("setup\n");
     return (int) syscall(__NR_io_uring_setup, entries, p);
 }
 
 int io_uring_enter(int ring_fd, unsigned int to_submit,
                         unsigned int min_complete, unsigned int flags)
 {
+    DEBUG("io_uring_enter\n");
     return (int) syscall(__NR_io_uring_enter, ring_fd, to_submit, min_complete,
                 flags, NULL, 0);
 }
@@ -76,6 +82,8 @@ int io_uring_enter(int ring_fd, unsigned int to_submit,
 
 off_t get_file_size(int fd) {
     struct stat st;
+
+    DEBUG("file_size\n");
 
     if(fstat(fd, &st) < 0) {
         perror("fstat");
@@ -202,9 +210,14 @@ int app_setup_uring(struct submitter *s) {
 * since we need to output character-by-character.
 * */
 void output_to_console(char *buf, int len) {
+    DEBUG("len = %d\n", len);
+#ifndef FWRITE
     while (len--) {
         fputc(*buf++, stdout);
     }
+#else
+    fwrite(buf, sizeof(char), len, stdout);
+#endif
 }
 
 /*
@@ -281,6 +294,8 @@ int submit_to_sq(char *file_path, struct submitter *s) {
     }
     fi->file_sz = file_sz;
 
+    DEBUG("Allocated %d blocks before reading\n", blocks);
+
     /*
     * For each block of the file we need to read, we allocate an iovec struct
     * which is indexed into the iovecs array. This array is passed in as part
@@ -304,6 +319,8 @@ int submit_to_sq(char *file_path, struct submitter *s) {
         current_block++;
         bytes_remaining -= bytes_to_read;
     }
+
+    DEBUG("read all the bytes\n");
 
     /* Add our submission queue entry to the tail of the SQE ring buffer */
     next_tail = tail = *sring->tail;
@@ -358,12 +375,17 @@ int main(int argc, char *argv[]) {
     }
     memset(s, 0, sizeof(*s));
 
+    DEBUG("Prepared submitter\n");
+
     if(app_setup_uring(s)) {
         fprintf(stderr, "Unable to setup uring!\n");
         return 1;
     }
 
+    DEBUG("app_setup_uring passed\n");
+
     for (int i = 1; i < argc; i++) {
+        DEBUG("operating on %s\n", argv[i]);
         if(submit_to_sq(argv[i], s)) {
             fprintf(stderr, "Error reading file\n");
             return 1;
