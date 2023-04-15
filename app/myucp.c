@@ -8,8 +8,11 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <liburing.h>
+#include <time.h>
+#include <sys/times.h>
 
 #include "debug.h"
+#include "time_lib.h"
 
 #define QD  16
 #define BS (128 * 1024)
@@ -23,21 +26,8 @@ struct io_data {
     struct iovec iov;
 };
 
-// buffer to hold a cache of io_data_ce
-static struct io_data * io_data_cb[2 * QD];
-static int io_data_cb_head, io_data_cb_tail;
-
-static int io_data_cb_full(){
-    return (io_data_cb_tail + 1) % ( 2 * QD ) == io_data_cb_head;
-}
-
-static int io_data_cb_empty(){
-    return io_data_cb_head == io_data_cb_tail;
-}
-
 static int setup_context(unsigned entries, struct io_uring *ring) {
     int ret;
-    struct io_data *data;
     DEBUG("Setting up context with entries = %d, ring ptr = %p\n", entries, (void *)ring);
 
     ret = io_uring_queue_init(entries, ring, 0);
@@ -45,27 +35,6 @@ static int setup_context(unsigned entries, struct io_uring *ring) {
         fprintf(stderr, "queue_init: %s\n", strerror(-ret));
         return -1;
     }
-
-    // allocate a global array of block sized
-    //  TODO: a better idea to make them global variables
-    for(int i = 0 ; i < 2 * QD ; i++){
-        data = malloc(BS + sizeof(*data));
-        if (!data){
-            for(int j = 0; j < 10 && !data; j++){ // retry 10 times before giving up
-                fprintf(stderr, "retrying malloc of size = %lx\n", BS + sizeof(*data));
-                data = malloc(BS + sizeof(*data));
-            }
-            if(!data){
-                perror("malloc of buffer cache failed");
-                exit(EXIT_FAILURE);
-            }
-        }
-        io_data_cb[i] = data;
-        DEBUG("io_data_cb initialized at i = %d with data ptr = %p\n", i, data);
-    }
-
-    io_data_cb_head = 0;
-    io_data_cb_tail = 0;
 
     return 0;
 }
@@ -123,24 +92,15 @@ static int queue_read(struct io_uring *ring, off_t size, off_t offset) {
 
     DEBUG("args: ring = %p, size = %ld, offset = %ld\n", ring, size, offset);
 
+    data = malloc(size + sizeof(*data));
+    if (!data)
+        return 1;
+
     sqe = io_uring_get_sqe(ring);
     if (!sqe) {
-        //free(data);
-        if(io_data_cb_empty()){
-            perror("Queue empty");
-            exit(EXIT_FAILURE);
-        }
-        DEBUG("io_data_cb freeing at i = %d\n", io_data_cb_head);
-        io_data_cb_head = (io_data_cb_head + 1) % (2 * QD);
+        free(data);
         return 1;
     }
-
-    if(io_data_cb_full()){
-        perror("Queue full");
-        exit(EXIT_FAILURE);
-    }
-    data = io_data_cb[io_data_cb_tail++];
-    io_data_cb_tail = (io_data_cb_tail) % ( 2 * QD );
 
     data->read = 1;
     data->offset = data->first_offset = offset;
@@ -291,13 +251,7 @@ int copy_file(struct io_uring *ring, off_t insize) {
                 reads--;
                 writes++;
             } else {
-                //free(data);
-                DEBUG("io_data_cb freeing at i = %d\n", io_data_cb_head);
-                if(io_data_cb_empty()){
-                    perror("Queue empty");
-                    exit(EXIT_FAILURE);
-                }
-                io_data_cb_head = (io_data_cb_head + 1) % (2 * QD);
+                free(data);
                 writes--;
             }
             io_uring_cqe_seen(ring, cqe);
@@ -313,6 +267,8 @@ int main(int argc, char *argv[]) {
     struct io_uring ring;
     off_t insize;
     int ret;
+
+    start_timer();
 
     if (argc < 3) {
         printf("Usage: %s <infile> <outfile>\n", argv[0]);
@@ -347,12 +303,13 @@ int main(int argc, char *argv[]) {
 
     DEBUG("file size = %ld\n", insize);
 
-    //for(int i = 0 ; i < 1000; i++)
-    //{
-    ret = copy_file(&ring, insize);
-    //DEBUG("file copy successful at i = %d\n", i);
-    DEBUG("file copy successful\n");
-    //}
+    for(int i = 0 ; i < 1; i++)
+    {
+        ret = copy_file(&ring, insize);
+        DEBUG("file copy successful at i = %d\n", i);
+    }
+
+    print_timer();
 
     close(infd);
     DEBUG("Closed infd\n");
@@ -361,5 +318,8 @@ int main(int argc, char *argv[]) {
 
     DEBUG("Queue exiting\n");
     io_uring_queue_exit(&ring);
+
+    print_timer();
+
     return ret;
 }

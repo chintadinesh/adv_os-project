@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/times.h>
+
 #include "debug.h"
+#include "time_lib.h"
 
 #define BUF_SIZE 128 * 1024
 
@@ -26,6 +31,8 @@ int copy_file(FILE *src, FILE *dst)
 int main(int argc, char **argv) {
     FILE *src, *dst;
 
+    start_timer();
+
     src = fopen(argv[1], "rb");  // Open source file for reading in binary mode
     if (src == NULL) {
         perror("Failed to open source file");
@@ -39,14 +46,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    //for(int i = 0; i < 1000; i++){
-    if(copy_file(src, dst))
-        perror("copy file");
-    else
-        //DEBUG("file copy successful at i = %d\n", i);
-        DEBUG("file copy successful\n");
+    for(int i = 0; i < 1; i++){
+        if(copy_file(src, dst))
+            perror("copy file");
+        else
+            DEBUG("file copy successful at i = %d\n", i);
+        //DEBUG("file copy successful\n");
 
-        /*
         if(fseek(src,
             0,
             SEEK_SET) != 0) {
@@ -60,10 +66,7 @@ int main(int argc, char **argv) {
                 perror("fseek");
                 exit(EXIT_FAILURE);
             }
-            */
-
-
-    //}
+    }
 
     if (ferror(src)) {
         perror("Error reading from source file");
@@ -71,8 +74,12 @@ int main(int argc, char **argv) {
         perror("Error writing to destination file");
     }
 
+    print_timer();
+
     fclose(src);
     fclose(dst);
+
+    print_timer();
 
     return 0;
 }
