@@ -7,7 +7,7 @@
 #include "debug.h"
 #include "time_lib.h"
 
-#define BUF_SIZE 128 * 1024
+#define BUF_SIZE 1024 * 1024
 
 int copy_file(FILE *src, FILE *dst)
 {

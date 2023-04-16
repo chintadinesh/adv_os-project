@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
@@ -10,14 +11,21 @@
 #include <liburing.h>
 #include <time.h>
 #include <sys/times.h>
+#include <dirent.h>
+#include <limits.h>
+#include <stdio.h>
+#include <errno.h>
 
 #include "debug.h"
 #include "time_lib.h"
 
-#define QD  16
-#define BS (128 * 1024)
+#define QD  4
+#define BS (1024 * 1024)
+
+#define BUFSIZE 4096
 
 static int infd, outfd;
+struct io_uring ring;
 
 struct io_data {
     int read;
@@ -229,13 +237,13 @@ int copy_file(struct io_uring *ring, off_t insize) {
                 }
                 fprintf(stderr, "cqe failed: %s\n",
                         strerror(-cqe->res));
-                return 1;
+                exit(EXIT_FAILURE); 
             } 
-            else if (cqe->res != data->iov.iov_len) { // a smaller read
+            else if (cqe->res != data->iov.iov_len) { // a smaller read/write
                 /* short read/write; adjust and requeue */
                 data->iov.iov_base += cqe->res; // TODO: What is the role of iov?
                 data->iov.iov_len -= cqe->res;
-                queue_prepped(ring, data); // TODO: Is this like writing the data now?
+                queue_prepped(ring, data); 
                 io_uring_cqe_seen(ring, cqe);
                 continue;
             }
@@ -263,8 +271,82 @@ int copy_file(struct io_uring *ring, off_t insize) {
     return 0;
 }
 
+void copy_dir(const char* src_dir, const char* dest_dir) {
+    char src_path[PATH_MAX]; 
+    char dest_path[PATH_MAX];
+    struct dirent *entry;
+    struct stat st;
+
+    DIR *dir;
+    dir = opendir(src_dir);
+
+    if (dir == NULL) { 
+        perror("Error opening source directory"); 
+        exit(EXIT_FAILURE); 
+    }
+
+    mkdir(dest_dir, 0755);
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 
+            || strcmp(entry->d_name, "..") == 0) 
+            continue;
+
+        snprintf(src_path, 
+                    sizeof(src_path), 
+                    "%s/%s", 
+                    src_dir, 
+                    entry->d_name);
+
+        snprintf(dest_path, 
+                sizeof(dest_path), 
+                "%s/%s", 
+                dest_dir, 
+                entry->d_name);
+
+        if (entry->d_type == DT_DIR) {
+            copy_dir(src_path, dest_path);
+        } else if (entry->d_type == DT_REG) {
+
+            infd = open(src_path, 
+                            O_RDONLY);
+                            
+            if (stat(src_path, &st) == -1) { 
+                perror("Error getting file status"); 
+                exit(EXIT_FAILURE); 
+            }
+
+            if (infd < 0) { 
+                fprintf(stderr, "Error opening source file: %s\n", strerror(errno)); 
+                exit(EXIT_FAILURE); 
+            }
+
+            outfd = open(dest_path, 
+                                O_WRONLY | O_CREAT | O_TRUNC, 
+                                st.st_mode);
+
+            if (outfd < 0) { 
+                fprintf(stderr, "Error creating destination file: %s\n", strerror(errno)); 
+                exit(EXIT_FAILURE); 
+            }
+
+            off_t insize;
+            if (get_file_size(infd, &insize)){
+                perror("get_file_size");
+                exit(EXIT_FAILURE);
+            }
+
+            copy_file(&ring, insize);
+
+            close(infd);
+            close(outfd);
+        }
+    }
+
+    closedir(dir);
+}
+
 int main(int argc, char *argv[]) {
-    struct io_uring ring;
     off_t insize;
     int ret;
 
@@ -276,45 +358,73 @@ int main(int argc, char *argv[]) {
     }
 
     DEBUG("Args: ");
+#if OPTDEBUG >= DEBUG_LEVEL_HIGH
     for(int i = 0; i < argc; i++){
         if(i == argc - 1)
             fprintf(stderr, "%s \n", argv[i]);
         else
             fprintf(stderr, "%s ", argv[i]);
     }
+#endif
 
-    infd = open(argv[1], O_RDONLY);
-    if (infd < 0) {
-        perror("open infile");
-        return 1;
+    // Get information about the source path
+    struct stat src_stat;
+    if (stat(argv[1], &src_stat) == -1) {
+        perror("Error getting source path information");
+        exit(EXIT_FAILURE);
     }
 
-    outfd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (outfd < 0) {
-        perror("open outfile");
-        return 1;
-    }
+    // Determine if the source path is a file or a directory
+    if (S_ISREG(src_stat.st_mode)) { // Source path is a regular file
+        infd = open(argv[1], O_RDONLY);
+        if (infd < 0) {
+            perror("open infile");
+            exit(EXIT_FAILURE);
+        }
 
-    if (setup_context(QD, &ring))
-        return 1;
+        outfd = open(argv[2], 
+                    O_WRONLY | O_CREAT | O_TRUNC, 
+                    src_stat);
 
-    if (get_file_size(infd, &insize))
-        return 1;
+        if (outfd < 0) {
+            perror("open outfile");
+            return 1;
+        }
 
-    DEBUG("file size = %ld\n", insize);
+        if (setup_context(QD, &ring))
+            return 1;
 
-    for(int i = 0 ; i < 1; i++)
-    {
-        ret = copy_file(&ring, insize);
-        DEBUG("file copy successful at i = %d\n", i);
+        if (get_file_size(infd, &insize))
+            return 1;
+
+        DEBUG("file size = %ld\n", insize);
+
+        for(int i = 0 ; i < 1; i++)
+        {
+            ret = copy_file(&ring, insize);
+            DEBUG("file copy successful at i = %d\n", i);
+        }
+
+    } 
+    else if (S_ISDIR(src_stat.st_mode)) {
+        // Source path is a directory
+
+        if (setup_context(QD, &ring))
+            return 1;
+        copy_dir(argv[1], argv[2]);
+    } else {
+        printf("Source path is not a regular file or directory\n");
+        exit(EXIT_FAILURE);
     }
 
     print_timer();
 
-    close(infd);
-    DEBUG("Closed infd\n");
-    close(outfd);
-    DEBUG("Closed outfd\n");
+    if (S_ISREG(src_stat.st_mode)) { // Source path is a regular file
+        close(infd);
+        DEBUG("Closed infd\n");
+        close(outfd);
+        DEBUG("Closed outfd\n");
+    }
 
     DEBUG("Queue exiting\n");
     io_uring_queue_exit(&ring);
