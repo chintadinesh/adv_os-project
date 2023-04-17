@@ -76,32 +76,6 @@ int io_uring_enter(int ring_fd, unsigned int to_submit,
 }
 
 /*
-* Returns the size of the file whose open file descriptor is passed in.
-* Properly handles regular file and block devices as well. Pretty.
-* */
-
-off_t get_file_size(int fd) {
-    struct stat st;
-
-    DEBUG("file_size\n");
-
-    if(fstat(fd, &st) < 0) {
-        perror("fstat");
-        return -1;
-    }
-    if (S_ISBLK(st.st_mode)) {
-        unsigned long long bytes;
-        if (ioctl(fd, BLKGETSIZE64, &bytes) != 0) {
-            perror("ioctl");
-            return -1;
-        }
-        return bytes;
-    } else if (S_ISREG(st.st_mode))
-        return st.st_size;
-
-    return -1;
-}
-/*
 * io_uring requires a lot of setup which looks pretty hairy, but isn't all
 * that difficult to understand. Because of all this boilerplate code,
 * io_uring's author has created liburing, which is relatively easy to use.
@@ -261,6 +235,29 @@ void read_from_cq(struct submitter *s) {
     *cring->head = head;
     write_barrier();
 }
+
+int get_file_size(int fd, off_t *size) 
+{
+    struct stat st;
+
+    if (fstat(fd, &st) < 0 )
+        return -1;
+    if(S_ISREG(st.st_mode)) {
+        *size = st.st_size;
+        return 0;
+    } else if (S_ISBLK(st.st_mode)) {
+        unsigned long long bytes;
+
+        if (ioctl(fd, BLKGETSIZE64, &bytes) != 0)
+            return -1;
+
+        *size = bytes;
+        return 0;
+    }
+    return -1;
+}
+
+
 /*
 * Submit to submission queue.
 * In this function, we submit requests to the submission queue. You can submit
@@ -270,6 +267,7 @@ void read_from_cq(struct submitter *s) {
 * */
 int submit_to_sq(char *file_path, struct submitter *s) {
     struct file_info *fi;
+    off_t file_sz;
 
     int file_fd = open(file_path, O_RDONLY);
     if (file_fd < 0 ) {
@@ -280,7 +278,7 @@ int submit_to_sq(char *file_path, struct submitter *s) {
     struct app_io_sq_ring *sring = &s->sq_ring;
     unsigned index = 0, current_block = 0, tail = 0, next_tail = 0;
 
-    off_t file_sz = get_file_size(file_fd);
+    get_file_size(file_fd, &file_sz);
     if (file_sz < 0)
         return 1;
     off_t bytes_remaining = file_sz;

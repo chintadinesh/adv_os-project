@@ -13,11 +13,11 @@
 #include <sys/times.h>
 #include <dirent.h>
 #include <limits.h>
-#include <stdio.h>
 #include <errno.h>
 
 #include "debug.h"
 #include "time_lib.h"
+#include "iolib.h"
 
 #define QD  4
 #define BS (1024 * 1024)
@@ -27,122 +27,10 @@
 static int infd, outfd;
 struct io_uring ring;
 
-struct io_data {
-    int read;
-    off_t first_offset, offset;
-    size_t first_len;
-    struct iovec iov;
-};
 
-static int setup_context(unsigned entries, struct io_uring *ring) {
-    int ret;
-    DEBUG("Setting up context with entries = %d, ring ptr = %p\n", entries, (void *)ring);
-
-    ret = io_uring_queue_init(entries, ring, 0);
-    if( ret < 0) {
-        fprintf(stderr, "queue_init: %s\n", strerror(-ret));
-        return -1;
-    }
-
-    return 0;
-}
-
-static int get_file_size(int fd, off_t *size) {
-    struct stat st;
-
-    if (fstat(fd, &st) < 0 )
-        return -1;
-    if(S_ISREG(st.st_mode)) {
-        *size = st.st_size;
-        return 0;
-    } else if (S_ISBLK(st.st_mode)) {
-        unsigned long long bytes;
-
-        if (ioctl(fd, BLKGETSIZE64, &bytes) != 0)
-            return -1;
-
-        *size = bytes;
-        return 0;
-    }
-    return -1;
-}
-
-static void queue_prepped(struct io_uring *ring, struct io_data *data) {
-    struct io_uring_sqe *sqe;
-
-    DEBUG("args: ring = %p, data = %p, with %s\n", 
-                ring, data, (data->read)? "read": "write");
-    sqe = io_uring_get_sqe(ring); // get a new entry
-    assert(sqe);
-
-    // interesting!
-    // TODO: There is only one queue for both reads and writes?
-    // can we have more than one queue?
-    if (data->read) // we change the file descriptors here
-        io_uring_prep_readv(sqe, 
-                            infd, 
-                            &data->iov, // TODO: Again, what is the role of iov 
-                            1,  //nr_vecs // TODO: What is this for
-                            data->offset);
-    else
-        io_uring_prep_writev(sqe, 
-                            outfd, 
-                            &data->iov, 
-                            1, 
-                            data->offset);
-
-    io_uring_sqe_set_data(sqe, data); // set the data field in the sque
-}
-
-static int queue_read(struct io_uring *ring, off_t size, off_t offset) {
-    struct io_uring_sqe *sqe;
-    struct io_data *data;
-
-    DEBUG("args: ring = %p, size = %ld, offset = %ld\n", ring, size, offset);
-
-    data = malloc(size + sizeof(*data));
-    if (!data)
-        return 1;
-
-    sqe = io_uring_get_sqe(ring);
-    if (!sqe) {
-        free(data);
-        return 1;
-    }
-
-    data->read = 1;
-    data->offset = data->first_offset = offset;
-
-    data->iov.iov_base = data + 1;
-    data->iov.iov_len = size;
-    data->first_len = size;
-
-    io_uring_prep_readv(sqe, 
-                        infd, 
-                        &data->iov, 
-                        1, 
-                        offset);
-
-    io_uring_sqe_set_data(sqe, 
-                            data);
-
-    return 0;
-}
-
-static void queue_write(struct io_uring *ring, struct io_data *data) {
-
-    DEBUG("args: ring = %p, data = %p\n", (void *)ring, (void *)data);
-    data->read = 0;
-    data->offset = data->first_offset;
-
-    data->iov.iov_base = data + 1;
-    data->iov.iov_len = data->first_len;
-
-    queue_prepped(ring, data);
-    io_uring_submit(ring);
-}
-
-int copy_file(struct io_uring *ring, off_t insize) {
+int copy_file(struct io_fop *fop) {
+    struct io_uring *ring = fop->pring;
+    off_t insize = fop->insize;
     unsigned long reads, writes; // TODO: do they track in progress reads and writes?
     struct io_uring_cqe *cqe;
     off_t write_left, offset;
@@ -175,7 +63,7 @@ int copy_file(struct io_uring *ring, off_t insize) {
             else if (!this_size)
                 break;
 
-            if (queue_read(ring, this_size, offset))
+            if (queue_read(ring, this_size, offset, fop))
                 break; // retry in the outer loop
 
             // TODO: partial read detect and verify
@@ -336,10 +224,17 @@ void copy_dir(const char* src_dir, const char* dest_dir) {
                 exit(EXIT_FAILURE);
             }
 
-            copy_file(&ring, insize);
+            struct io_fop *fop = (struct io_fop *)malloc(sizeof(struct io_fop));
+            fop->infd = infd;
+            fop->outfd = outfd;
+            fop->insize = insize;
+            fop->pring = &ring;
 
-            close(infd);
-            close(outfd);
+            copy_file(fop);
+
+            close(fop->infd);
+            close(fop->outfd);
+            free(fop);
         }
     }
 
@@ -399,12 +294,19 @@ int main(int argc, char *argv[]) {
 
         DEBUG("file size = %ld\n", insize);
 
+        struct io_fop *fop = (struct io_fop *)malloc(sizeof(struct io_fop));
+        fop->infd = infd;
+        fop->outfd = outfd;
+        fop->insize = insize;
+        fop->pring = &ring;
+
         for(int i = 0 ; i < 1; i++)
         {
-            ret = copy_file(&ring, insize);
+            ret = copy_file(fop);
             DEBUG("file copy successful at i = %d\n", i);
         }
 
+        free(fop);
     } 
     else if (S_ISDIR(src_stat.st_mode)) {
         // Source path is a directory

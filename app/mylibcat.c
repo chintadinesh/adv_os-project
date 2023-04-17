@@ -3,8 +3,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <liburing.h>
 #include <stdlib.h>
+
+#include "iolib.h"
 
 #define QUEUE_DEPTH 1
 #define BLOCK_SZ    1024
@@ -13,31 +14,6 @@ struct file_info {
     off_t file_sz;
     struct iovec iovecs[];      /* Referred by readv/writev */
 };
-
-/*
-* Returns the size of the file whose open file descriptor is passed in.
-* Properly handles regular file and block devices as well. Pretty.
-* */
-
-off_t get_file_size(int fd) {
-    struct stat st;
-
-    if(fstat(fd, &st) < 0) {
-        perror("fstat");
-        return -1;
-    }
-    if (S_ISBLK(st.st_mode)) {
-        unsigned long long bytes;
-        if (ioctl(fd, BLKGETSIZE64, &bytes) != 0) {
-            perror("ioctl");
-            return -1;
-        }
-        return bytes;
-    } else if (S_ISREG(st.st_mode))
-        return st.st_size;
-
-    return -1;
-}
 
 /*
  * Output a string of characters of len length to stdout.
@@ -81,12 +57,13 @@ int get_completion_and_print(struct io_uring *ring) {
  * */
 
 int submit_read_request(char *file_path, struct io_uring *ring) {
+    off_t file_sz; 
     int file_fd = open(file_path, O_RDONLY);
     if (file_fd < 0) {
         perror("open");
         return 1;
     }
-    off_t file_sz = get_file_size(file_fd);
+    get_file_size(file_fd, &file_sz);
     off_t bytes_remaining = file_sz;
     off_t offset = 0;
     int current_block = 0;

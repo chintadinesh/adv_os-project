@@ -81,7 +81,7 @@ $(info TEST_BINS : $(TEST_BINS))
 all: $(LIB_DIR) $(SLIB_DIR) $(OBJ_DIR) $(TEST_OBJS) $(BIN_DIR) $(TEST_BIN_DIR) $(TEST_BINS)  $(BINS) 
 
 $(TEST_BIN_DIR)/%: $(LIBS) $(TEST_OBJ_DIR)/%.o 
-	$(LDD) $(TEST_LDFLAGS) $(TEST_CFLAGS) -I$(INC_DIR) -o $@ $^ -L/usr/lib -lc -lm
+	$(LDD) $(TEST_LDFLAGS) $(TEST_CFLAGS) -I$(INC_DIR) -o $@ $^ -L/usr/lib -lc -lm -luring
 
 $(BIN_DIR)/%: $(LIBS) $(OBJ_DIR)/%.o 
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(INC_DIR) -o $@ $^ -luring 
