@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <liburing.h>
 
+#include "debug.h"
+
 static struct tms tms_start, tms_end;
 static clock_t start_time, end_time;
 static double user_time, system_time, real_time; 
@@ -25,7 +27,9 @@ void print_timer()
     system_time = (double)(tms_end.tms_stime - tms_start.tms_stime) / sysconf(_SC_CLK_TCK);
     real_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-    fprintf(stderr, "User time: %.6f seconds\n", user_time);
-    fprintf(stderr, "System time: %.6f seconds\n", system_time);
-    fprintf(stderr, "Real time: %.6f seconds\n", real_time);
+    WARNING("User time: %.6f seconds\n", user_time);
+    WARNING("System time: %.6f seconds\n", system_time);
+    WARNING("Real time: %.6f seconds\n", real_time);
+
+    fprintf(stderr, "%0.6f, %0.6f, %0.6f, ", user_time, system_time, real_time);
 }

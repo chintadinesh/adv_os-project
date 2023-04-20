@@ -52,3 +52,8 @@ sync
 sudo umount virtualdisk
 sudo losetup -d /dev/loop40
 ```
+
+### Check if a file is in buffer cache
+```
+sudo fincore /path/to/file
+```

@@ -18,13 +18,14 @@
 #include "debug.h"
 #include "time_lib.h"
 #include "iolib.h"
+#include "parse_opts.h"
+#include "fileaccess_lib.h"
 
-#define QD  4
+#define QUEUE_DEPTH  4
+
+#ifndef BS
 #define BS (4 * 1024)
-
-#define BUFSIZE 4096
-
-
+#endif
 
 int copy_file(struct io_fop *fop) {
     struct io_uring *ring = fop->pring;
@@ -51,8 +52,8 @@ int copy_file(struct io_fop *fop) {
         while (insize) { // attempt a read when data left to read
             off_t this_size = insize;
 
-            if (reads + writes >= QD){// TODO: I don't understand this
-                DEBUG("reads + writes >= QD\n");
+            if (reads + writes >= QUEUE_DEPTH){// TODO: I don't understand this
+                DEBUG("reads + writes >= QUEUE_DEPTH\n");
                 break;
             }
 
@@ -257,6 +258,11 @@ int main(int argc, char *argv[]) {
 
     PRINT_ARGS();
 
+    if(ret = system_mount()){
+        perror("mount");
+        exit(1);
+    }
+
     // Get information about the source path
     struct stat src_stat;
     if (stat(argv[1], &src_stat) == -1) {
@@ -283,7 +289,7 @@ int main(int argc, char *argv[]) {
 
         pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
-        if (setup_context(QD, pring, 0))
+        if (setup_context(QUEUE_DEPTH, pring, 0))
             return 1;
 
         if (get_file_size(infd, &insize))
@@ -307,7 +313,7 @@ int main(int argc, char *argv[]) {
         // Source path is a directory
         pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
-        if (setup_context(QD, pring, 0))
+        if (setup_context(QUEUE_DEPTH, pring, 0))
             return 1;
         copy_dir(argv[1], argv[2], pring);
     } else {
@@ -333,6 +339,13 @@ int main(int argc, char *argv[]) {
     io_uring_queue_exit(pring);
 
     print_timer();
+    fprintf(stderr, "\n");
+
+    if(ret = system_umount()){
+        perror("umount");
+        exit(EXIT_FAILURE);
+    }
+
 
     return ret;
 }

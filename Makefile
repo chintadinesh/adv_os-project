@@ -7,10 +7,15 @@ ifeq ($(DEBUG),)
     DEBUG = 3
 endif
 
+ifeq ($(QD),)
+    # Define a default value for VARNAME if not defined
+    QD = 16
+endif
+
 CC = gcc
 LDD = gcc
 
-CFLAGS = -Wextra -DFWRITE -O0 -DOPTDEBUG=$(DEBUG) 
+CFLAGS = -Wextra -DFWRITE -O0 -DOPTDEBUG=$(DEBUG)  -DQUEUE_DEPTH=$(QD)
 #CFLAGS = -Wextra -O0
 SCFLAGS =-fPIC -DOPTDEBUG =$(DEBUG) 
 

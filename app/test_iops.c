@@ -96,7 +96,7 @@ int iops_main(int argc, char **argv) {
         DEBUG("memory mapped at address = %p, length = 0x%x\n", buffer, NUM_BLOCKS * BLOCK_SIZE);
 
         // Initialize io_uring
-        ret = io_uring_queue_init(QUEUE_DEPTH, &ring, IORING_SETUP_IOPOLL);
+        ret = io_uring_queue_init(QUEUE_DEPTH, &ring, (opts.opt_poll) ? IORING_SETUP_IOPOLL : 0);
         if (ret < 0) {
             perror("io_uring_queue_init");
             return 1;
