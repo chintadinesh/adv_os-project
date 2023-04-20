@@ -20,12 +20,10 @@
 #include "iolib.h"
 
 #define QD  4
-#define BS (1024 * 1024)
+#define BS (4 * 1024)
 
 #define BUFSIZE 4096
 
-static int infd, outfd;
-struct io_uring ring;
 
 
 int copy_file(struct io_fop *fop) {
@@ -159,7 +157,10 @@ int copy_file(struct io_fop *fop) {
     return 0;
 }
 
-void copy_dir(const char* src_dir, const char* dest_dir) {
+void copy_dir(const char* src_dir, 
+            const char* dest_dir, 
+            struct io_uring *pring) 
+{
     char src_path[PATH_MAX]; 
     char dest_path[PATH_MAX];
     struct dirent *entry;
@@ -193,10 +194,10 @@ void copy_dir(const char* src_dir, const char* dest_dir) {
                 entry->d_name);
 
         if (entry->d_type == DT_DIR) {
-            copy_dir(src_path, dest_path);
+            copy_dir(src_path, dest_path, pring);
         } else if (entry->d_type == DT_REG) {
 
-            infd = open(src_path, 
+            int infd = open(src_path, 
                             O_RDONLY);
                             
             if (stat(src_path, &st) == -1) { 
@@ -209,7 +210,7 @@ void copy_dir(const char* src_dir, const char* dest_dir) {
                 exit(EXIT_FAILURE); 
             }
 
-            outfd = open(dest_path, 
+            int outfd = open(dest_path, 
                                 O_WRONLY | O_CREAT | O_TRUNC, 
                                 st.st_mode);
 
@@ -228,7 +229,7 @@ void copy_dir(const char* src_dir, const char* dest_dir) {
             fop->infd = infd;
             fop->outfd = outfd;
             fop->insize = insize;
-            fop->pring = &ring;
+            fop->pring = pring;
 
             copy_file(fop);
 
@@ -244,6 +245,8 @@ void copy_dir(const char* src_dir, const char* dest_dir) {
 int main(int argc, char *argv[]) {
     off_t insize;
     int ret;
+    struct io_uring *pring;
+    struct io_fop *fop;
 
     start_timer();
 
@@ -252,15 +255,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    DEBUG("Args: ");
-#if OPTDEBUG >= DEBUG_LEVEL_HIGH
-    for(int i = 0; i < argc; i++){
-        if(i == argc - 1)
-            fprintf(stderr, "%s \n", argv[i]);
-        else
-            fprintf(stderr, "%s ", argv[i]);
-    }
-#endif
+    PRINT_ARGS();
 
     // Get information about the source path
     struct stat src_stat;
@@ -271,13 +266,13 @@ int main(int argc, char *argv[]) {
 
     // Determine if the source path is a file or a directory
     if (S_ISREG(src_stat.st_mode)) { // Source path is a regular file
-        infd = open(argv[1], O_RDONLY);
+        int infd = open(argv[1], O_RDONLY);
         if (infd < 0) {
             perror("open infile");
             exit(EXIT_FAILURE);
         }
 
-        outfd = open(argv[2], 
+        int outfd = open(argv[2], 
                     O_WRONLY | O_CREAT | O_TRUNC, 
                     src_stat);
 
@@ -286,7 +281,9 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        if (setup_context(QD, &ring))
+        pring = (struct io_uring *)malloc(sizeof(struct io_uring));
+
+        if (setup_context(QD, pring, 0))
             return 1;
 
         if (get_file_size(infd, &insize))
@@ -294,42 +291,46 @@ int main(int argc, char *argv[]) {
 
         DEBUG("file size = %ld\n", insize);
 
-        struct io_fop *fop = (struct io_fop *)malloc(sizeof(struct io_fop));
+        fop = (struct io_fop *)malloc(sizeof(struct io_fop));
         fop->infd = infd;
         fop->outfd = outfd;
         fop->insize = insize;
-        fop->pring = &ring;
+        fop->pring = pring;
 
         for(int i = 0 ; i < 1; i++)
         {
             ret = copy_file(fop);
             DEBUG("file copy successful at i = %d\n", i);
         }
-
-        free(fop);
     } 
     else if (S_ISDIR(src_stat.st_mode)) {
         // Source path is a directory
+        pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
-        if (setup_context(QD, &ring))
+        if (setup_context(QD, pring, 0))
             return 1;
-        copy_dir(argv[1], argv[2]);
+        copy_dir(argv[1], argv[2], pring);
     } else {
         printf("Source path is not a regular file or directory\n");
         exit(EXIT_FAILURE);
     }
 
+    free(pring);
     print_timer();
 
     if (S_ISREG(src_stat.st_mode)) { // Source path is a regular file
-        close(infd);
+
+        close(fop->infd);
         DEBUG("Closed infd\n");
-        close(outfd);
+        close(fop->outfd);
         DEBUG("Closed outfd\n");
+
+        free(fop);
+
     }
 
     DEBUG("Queue exiting\n");
-    io_uring_queue_exit(&ring);
+    io_uring_queue_exit(pring);
 
     print_timer();
 

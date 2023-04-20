@@ -11,12 +11,12 @@
 #include "iolib.h"
 #include "debug.h"
 
-int setup_context(unsigned entries, struct io_uring *ring) 
+int setup_context(unsigned entries, struct io_uring *ring, unsigned flags) 
 {
     int ret;
     DEBUG("Setting up context with entries = %d, ring ptr = %p\n", entries, (void *)ring);
 
-    ret = io_uring_queue_init(entries, ring, 0);
+    ret = io_uring_queue_init(entries, ring, flags);
     if( ret < 0) {
         fprintf(stderr, "queue_init: %s\n", strerror(-ret));
         return -1;

@@ -1,0 +1,4 @@
+#! /bin/bash
+
+sudo losetup /dev/loop40 virtualdisk/vdisk.img
+sudo mount /dev/loop40 virtualdisk

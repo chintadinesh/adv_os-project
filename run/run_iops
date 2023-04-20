@@ -1,0 +1,50 @@
+#! /bin/bash
+
+echo "io_uring normal"
+sudo ./bin/test_iops  > "report/iops_io_uring.csv" 2>&1
+sudo ./bin/test_iops  >> "report/iops_io_uring.csv" 2>&1
+sudo ./bin/test_iops  >> "report/iops_io_uring.csv" 2>&1
+sudo ./bin/test_iops  >> "report/iops_io_uring.csv" 2>&1
+sudo ./bin/test_iops  >> "report/iops_io_uring.csv" 2>&1
+
+echo "synchronous normal"
+sudo ./bin/test_iops  -s > "report/iops_sync.csv" 2>&1
+sudo ./bin/test_iops  -s >> "report/iops_sync.csv" 2>&1
+sudo ./bin/test_iops  -s >> "report/iops_sync.csv" 2>&1
+sudo ./bin/test_iops  -s >> "report/iops_sync.csv" 2>&1
+sudo ./bin/test_iops  -s >> "report/iops_sync.csv" 2>&1
+
+echo "io_uring random"
+sudo ./bin/test_iops -r > "report/iops_io_uring_random.csv" 2>&1
+sudo ./bin/test_iops -r >> "report/iops_io_uring_random.csv" 2>&1
+sudo ./bin/test_iops -r >> "report/iops_io_uring_random.csv" 2>&1
+sudo ./bin/test_iops -r >> "report/iops_io_uring_random.csv" 2>&1
+sudo ./bin/test_iops -r >> "report/iops_io_uring_random.csv" 2>&1
+
+echo "synchronous random"
+sudo ./bin/test_iops -r -s > "report/iops_sync_random.csv" 2>&1
+sudo ./bin/test_iops -r -s >> "report/iops_sync_random.csv" 2>&1
+sudo ./bin/test_iops -r -s >> "report/iops_sync_random.csv" 2>&1
+sudo ./bin/test_iops -r -s >> "report/iops_sync_random.csv" 2>&1
+sudo ./bin/test_iops -r -s >> "report/iops_sync_random.csv" 2>&1
+
+echo "io_uring random direct"
+sudo ./bin/test_iops -d -r > "report/iops_io_uring_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r >> "report/iops_io_uring_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r >> "report/iops_io_uring_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r >> "report/iops_io_uring_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r >> "report/iops_io_uring_random_direct.csv" 2>&1
+
+echo "synchronous random direct"
+sudo ./bin/test_iops -d -r -s > "report/iops_sync_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r -s >> "report/iops_sync_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r -s >> "report/iops_sync_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r -s >> "report/iops_sync_random_direct.csv" 2>&1
+sudo ./bin/test_iops -d -r -s >> "report/iops_sync_random_direct.csv" 2>&1
+
+echo "io_uring random polling"
+sudo ./bin/test_iops -r -p > "report/iops_io_uring_random_poll.csv" 2>&1
+sudo ./bin/test_iops -r -p >> "report/iops_io_uring_random_poll.csv" 2>&1
+sudo ./bin/test_iops -r -p >> "report/iops_io_uring_random_poll.csv" 2>&1
+sudo ./bin/test_iops -r -p >> "report/iops_io_uring_random_poll.csv" 2>&1
+sudo ./bin/test_iops -r -p >> "report/iops_io_uring_random_poll.csv" 2>&1

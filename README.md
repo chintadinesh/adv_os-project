@@ -27,3 +27,28 @@ ls -lh 300mb
  * Hence, we can modify the copy the utility to see the impact of the block size.
  * I guess that it should not have an impact because I don't see performance improvement 
  by just increasing the block size.
+
+#### Create a virtual disk
+```
+sudo mkdir /mnt/virtualdisk
+sudo dd if=/dev/zero of=/mnt/virtualdisk/vdisk.img bs=1M count=100
+sudo losetup /dev/loop0 /mnt/virtualdisk/vdisk.img
+sudo mkfs.ext4 /dev/loop0 
+```
+#### Mount the virtual disk
+```
+sudo mount /dev/loop0 /mnt/virtualdisk
+sudo dd if=/dev/urandom of=virtualdisk/largefile bs=1G count=4
+```
+
+#### Write something to the file and sync
+```
+echo "Hello World" > /mnt/virtualdisk/largefile
+sync
+```
+
+#### Unmount the virtual disk to flush the file
+```
+sudo umount virtualdisk
+sudo losetup -d /dev/loop40
+```

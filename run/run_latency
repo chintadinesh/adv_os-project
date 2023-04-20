@@ -1,0 +1,33 @@
+#! /bin/bash
+
+echo "io_uring"
+sudo ./bin/test_iops -l > "report/latency_io_uring.csv" 2>&1
+sudo ./bin/test_iops -l >> "report/latency_io_uring.csv" 2>&1
+sudo ./bin/test_iops -l >> "report/latency_io_uring.csv" 2>&1
+sudo ./bin/test_iops -l >> "report/latency_io_uring.csv" 2>&1
+sudo ./bin/test_iops -l >> "report/latency_io_uring.csv" 2>&1
+
+echo "synchronous"
+sudo ./bin/test_iops -l -s > "report/latency_sync.csv" 2>&1
+sudo ./bin/test_iops -l -s >> "report/latency_sync.csv" 2>&1
+sudo ./bin/test_iops -l -s >> "report/latency_sync.csv" 2>&1
+sudo ./bin/test_iops -l -s >> "report/latency_sync.csv" 2>&1
+sudo ./bin/test_iops -l -s >> "report/latency_sync.csv" 2>&1
+
+echo "io_uring IO_DIRECT"
+sudo ./bin/test_iops -d -l > "report/latency_io_uring_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l >> "report/latency_io_uring_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l >> "report/latency_io_uring_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l >> "report/latency_io_uring_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l >> "report/latency_io_uring_direct.csv" 2>&1
+
+echo "synchronous IO_DIRECT"
+sudo ./bin/test_iops -d -l -s > "report/latency_sync_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l -s >> "report/latency_sync_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l -s >> "report/latency_sync_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l -s >> "report/latency_sync_direct.csv" 2>&1
+sudo ./bin/test_iops -d -l -s >> "report/latency_sync_direct.csv" 2>&1
+
+
+
+

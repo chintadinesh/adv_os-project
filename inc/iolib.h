@@ -20,8 +20,7 @@ struct io_data {
 };
 
 
-int setup_context(unsigned entries, 
-                  struct io_uring *ring);
+int setup_context(unsigned entries, struct io_uring *ring, unsigned flags);
 
 int get_file_size(int fd, 
                         off_t *size);

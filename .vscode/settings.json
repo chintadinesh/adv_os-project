@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "iolib.h": "c",
+    "unistd.h": "c",
+    "parse_opts.h": "c"
+  }
+}

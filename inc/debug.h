@@ -22,6 +22,22 @@
     time_str; \
 })
 
+
+#if OPTDEBUG >= DEBUG_LEVEL_MEDIUM
+#define PRINT_ARGS() ({ \
+    WARNING("Args: "); \
+    for(int i = 0; i < argc; i++){ \
+        if(i == argc - 1) \
+            fprintf(stderr, "%s \n", argv[i]); \
+        else \
+            fprintf(stderr, "%s ", argv[i]); \
+    }\
+})
+#else
+    #define PRINT_ARGS() do {} while (0)
+#endif
+
+
 #if OPTDEBUG >= DEBUG_LEVEL_HIGH
 #define DEBUG(fmt, ...) do { \
     struct timeval tv; \
