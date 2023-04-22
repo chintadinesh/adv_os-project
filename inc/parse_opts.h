@@ -7,6 +7,9 @@ struct opts {
     int opt_direct;
     int opt_latency;
     int opt_poll;
+    int opt_testing;
+    char *opt_input_path;
+    char *opt_output_path;
 };
 
 void parse_opts(int argc, char *argv[]);

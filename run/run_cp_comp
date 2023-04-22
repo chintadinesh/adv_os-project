@@ -1,0 +1,35 @@
+#!  /bin/bash
+
+
+
+BS=131072 
+QUEUE_DEPTH=16
+
+#iterate through each queue deapth
+
+# Initialize counter variable
+
+# Iterate over each item
+echo "Testing io_uring copy"
+
+sudo ./bash/mountfs
+echo "BS = $BS QUEUE_DEPTH = $QUEUE_DEPTH "
+make clean
+make DEBUG=0 "BS=$BS" "QUEUE_DEPTH=$QUEUE_DEPTH"  > /dev/null 2>&1
+# Perform some action on the item
+# ...
+sudo fincore virtualdisk/largefile
+time ./bin/myucp virtualdisk/largefile virtualdisk/largefile_copy 
+time ./bin/myucp virtualdisk/largefile virtualdisk/largefile_copy 
+
+sudo ./bash/umountfs
+
+
+echo "Testing system copy"
+
+sudo ./bash/mountfs
+sudo fincore virtualdisk/largefile
+time cp virtualdisk/largefile virtualdisk/largefile_copy 
+time cp virtualdisk/largefile virtualdisk/largefile_copy 
+
+sudo ./bash/umountfs

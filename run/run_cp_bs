@@ -1,0 +1,30 @@
+#!  /bin/bash
+
+
+
+BS=32768
+
+#iterate through each queue deapth
+while [ $BS -le 1048576 ]
+do
+
+  # Initialize counter variable
+  COUNT=1
+
+  touch "report/bsucp_$BS.csv"
+
+  # Iterate over each item
+  while [ $COUNT -le 5 ]
+  do
+      echo "BS = $BS Count = $COUNT"
+      make clean
+      make DEBUG=0 "BS=$BS" 
+      # Perform some action on the item
+      # ...
+      ./bin/myucp -t virtualdisk/largefile virtualdisk/largefile_copy >> "report/bsucp_$BS.csv" 2>&1
+      ((COUNT++))
+  done
+
+  ((BS*=2))
+
+done

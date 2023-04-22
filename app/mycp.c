@@ -6,16 +6,22 @@
 
 #include "debug.h"
 #include "time_lib.h"
+#include "fileaccess_lib.h"
+#include "parse_opts.h"
 
-#define BUF_SIZE 4 * 1024
+#ifndef BS
+#define BS 4 * 1024
+#endif
+
+extern struct opts opts;
 
 int copy_file(FILE *src, FILE *dst)
 {
-    char buffer[BUF_SIZE];
+    char buffer[BS];
     size_t bytesRead, bytesWritten;
     DEBUG("args: src dst\n");
 
-    while ((bytesRead = fread(buffer, 1, BUF_SIZE, src)) > 0) {
+    while ((bytesRead = fread(buffer, 1, BS, src)) > 0) {
         bytesWritten = fwrite(buffer, 1, bytesRead, dst);
         if (bytesWritten != bytesRead) {
             perror("Failed to write to destination file");
@@ -30,8 +36,16 @@ int copy_file(FILE *src, FILE *dst)
 
 int main(int argc, char **argv) {
     FILE *src, *dst;
+    int ret;
+
+    if(ret = system_mount()){
+        perror("mount");
+        exit(1);
+    }
 
     start_timer();
+
+    PRINT_ARGS();
 
     src = fopen(argv[1], "rb");  // Open source file for reading in binary mode
     if (src == NULL) {
@@ -80,6 +94,14 @@ int main(int argc, char **argv) {
     fclose(dst);
 
     print_timer();
+    fprintf(stderr, "\n");
+
+    if(opts.opt_testing){
+        if(ret = system_umount()){
+            perror("umount");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     return 0;
 }

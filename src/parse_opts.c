@@ -14,6 +14,7 @@ void print_opts(void)
     WARNING("\to_direct = %d\n", opts.opt_direct); 
     WARNING("\tlatency test = %d\n", opts.opt_latency); 
     WARNING("\tio_uring poll = %d\n", opts.opt_poll); 
+    WARNING("\ttesting mode = %d\n", opts.opt_testing); 
     WARNING("}\n"); 
 } 
 
@@ -26,8 +27,11 @@ void parse_opts(int argc, char *argv[]){
     opts.opt_direct = 0;
     opts.opt_latency = 0;
     opts.opt_poll = 0;
+    opts.opt_testing = 0;
+    opts.opt_input_path = NULL;
+    opts.opt_output_path = NULL;
 
-    while ((c = getopt(argc, argv, "ursdlp")) != -1) {
+    while ((c = getopt(argc, argv, "i:o:ursdlpt")) != -1) {
         switch (c) {
         case 'u':
             printf("Valid options are :\n");
@@ -37,7 +41,18 @@ void parse_opts(int argc, char *argv[]){
             printf("\t-r: random access\n");
             printf("\t-d: open file in O_DIRECT to bypass page cache\n");
             printf("\t-p: enable polling for IO_URING\n");
+            printf("\t-t: enable testing so that virtdisk automatically mounts and unmounts\n");
             exit(EXIT_SUCCESS);
+            break;
+        case 'i':
+            WARNING("Option input file: ");
+            opts.opt_input_path = optarg;
+            WARNING("%s\n", optarg);
+            break;
+        case 'o':
+            WARNING("Option output file: ");
+            opts.opt_output_path = optarg;
+            WARNING("%s\n", optarg);
             break;
         case 'r':
             WARNING("Option random access enabled\n");
@@ -58,6 +73,10 @@ void parse_opts(int argc, char *argv[]){
         case 'p':
             WARNING("Option io_uring poll enabled\n");
             opts.opt_poll = 1;
+            break;
+        case 't':
+            WARNING("Option testing enabled\n");
+            opts.opt_testing = 1;
             break;
         default:
             break;

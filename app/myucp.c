@@ -21,7 +21,9 @@
 #include "parse_opts.h"
 #include "fileaccess_lib.h"
 
+#ifndef QUEUE_DEPTH
 #define QUEUE_DEPTH  4
+#endif
 
 #ifndef BS
 #define BS (4 * 1024)
@@ -243,42 +245,48 @@ void copy_dir(const char* src_dir,
     closedir(dir);
 }
 
+extern struct opts opts;
+
 int main(int argc, char *argv[]) {
     off_t insize;
     int ret;
     struct io_uring *pring;
     struct io_fop *fop;
 
-    start_timer();
-
     if (argc < 3) {
         printf("Usage: %s <infile> <outfile>\n", argv[0]);
         return 1;
     }
 
-    PRINT_ARGS();
+    //PRINT_ARGS();
+    parse_opts(argc, argv);
+    print_opts();
 
-    if(ret = system_mount()){
-        perror("mount");
-        exit(1);
+    if(opts.opt_testing){
+        if(ret = system_mount()){
+            perror("mount");
+            exit(1);
+        }
     }
+
+    start_timer();
 
     // Get information about the source path
     struct stat src_stat;
-    if (stat(argv[1], &src_stat) == -1) {
+    if (stat(opts.opt_input_path, &src_stat) == -1) {
         perror("Error getting source path information");
         exit(EXIT_FAILURE);
     }
 
     // Determine if the source path is a file or a directory
     if (S_ISREG(src_stat.st_mode)) { // Source path is a regular file
-        int infd = open(argv[1], O_RDONLY);
+        int infd = open(opts.opt_input_path, O_RDONLY);
         if (infd < 0) {
             perror("open infile");
             exit(EXIT_FAILURE);
         }
 
-        int outfd = open(argv[2], 
+        int outfd = open(opts.opt_output_path, 
                     O_WRONLY | O_CREAT | O_TRUNC, 
                     src_stat);
 
@@ -289,7 +297,11 @@ int main(int argc, char *argv[]) {
 
         pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
+#ifdef POLL
+        if (setup_context(QUEUE_DEPTH, pring, IORING_SETUP_IOPOLL ))
+#else
         if (setup_context(QUEUE_DEPTH, pring, 0))
+#endif
             return 1;
 
         if (get_file_size(infd, &insize))
@@ -313,9 +325,13 @@ int main(int argc, char *argv[]) {
         // Source path is a directory
         pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
+#ifdef POLL
+        if (setup_context(QUEUE_DEPTH, pring, IORING_SETUP_IOPOLL ))
+#else
         if (setup_context(QUEUE_DEPTH, pring, 0))
+#endif
             return 1;
-        copy_dir(argv[1], argv[2], pring);
+        copy_dir(opts.opt_input_path, opts.opt_output_path, pring);
     } else {
         printf("Source path is not a regular file or directory\n");
         exit(EXIT_FAILURE);
@@ -341,9 +357,11 @@ int main(int argc, char *argv[]) {
     print_timer();
     fprintf(stderr, "\n");
 
-    if(ret = system_umount()){
-        perror("umount");
-        exit(EXIT_FAILURE);
+    if(opts.opt_testing){
+        if(ret = system_umount()){
+            perror("umount");
+            exit(EXIT_FAILURE);
+        }
     }
 
 

@@ -12,10 +12,22 @@ ifeq ($(QD),)
     QD = 16
 endif
 
+ifeq ($(BS),)
+    # Define a default value for VARNAME if not defined
+    BS = 4096
+endif
+
+CFLAGS = -Wextra -DFWRITE -O0 -DOPTDEBUG=$(DEBUG)  -DQUEUE_DEPTH=$(QD) -DBS=$(BS)
+
+ifeq ($(POLL), 1)
+	CFLAGS += -DPOLL
+endif
+
+
+
 CC = gcc
 LDD = gcc
 
-CFLAGS = -Wextra -DFWRITE -O0 -DOPTDEBUG=$(DEBUG)  -DQUEUE_DEPTH=$(QD)
 #CFLAGS = -Wextra -O0
 SCFLAGS =-fPIC -DOPTDEBUG =$(DEBUG) 
 
