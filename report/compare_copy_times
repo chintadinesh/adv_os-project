@@ -1,0 +1,425 @@
+Count = 1 file size = 1kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+0.000000, 0.000000, 0.000522, 0.000000, 0.000000, 0.000866, 
+
+real	0m0.038s
+user	0m0.001s
+sys	0m0.002s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+
+real	0m0.157s
+user	0m0.002s
+sys	0m0.001s
+Count = 2 file size = 1kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+0.000000, 0.000000, 0.000212, 0.000000, 0.000000, 0.000407, 
+
+real	0m0.030s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+
+real	0m0.022s
+user	0m0.002s
+sys	0m0.000s
+Count = 3 file size = 1kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+0.000000, 0.000000, 0.000223, 0.000000, 0.000000, 0.000431, 
+
+real	0m0.026s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+
+real	0m0.009s
+user	0m0.002s
+sys	0m0.000s
+Count = 4 file size = 1kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+0.000000, 0.000000, 0.000238, 0.000000, 0.000000, 0.000411, 
+
+real	0m0.017s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+
+real	0m0.004s
+user	0m0.000s
+sys	0m0.002s
+Count = 5 file size = 1kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+0.000000, 0.000000, 0.000290, 0.000000, 0.000000, 0.000493, 
+
+real	0m0.024s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1K virtualdisk/1kb
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.000s
+Count = 1 file size = 32kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+0.000000, 0.000000, 0.000273, 0.000000, 0.000000, 0.000456, 
+
+real	0m0.020s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+
+real	0m0.006s
+user	0m0.000s
+sys	0m0.002s
+Count = 2 file size = 32kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+0.000000, 0.000000, 0.000215, 0.000000, 0.000000, 0.000383, 
+
+real	0m0.019s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+
+real	0m0.005s
+user	0m0.000s
+sys	0m0.002s
+Count = 3 file size = 32kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+0.000000, 0.000000, 0.000275, 0.000000, 0.000000, 0.000448, 
+
+real	0m0.018s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+
+real	0m0.005s
+user	0m0.002s
+sys	0m0.000s
+Count = 4 file size = 32kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+0.000000, 0.000000, 0.000197, 0.000000, 0.000000, 0.000376, 
+
+real	0m0.026s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+
+real	0m0.005s
+user	0m0.002s
+sys	0m0.000s
+Count = 5 file size = 32kb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+0.000000, 0.000000, 0.000226, 0.000000, 0.000000, 0.000430, 
+
+real	0m0.023s
+user	0m0.001s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32K virtualdisk/32kb
+
+real	0m0.006s
+user	0m0.001s
+sys	0m0.001s
+Count = 1 file size = 1mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+0.000000, 0.000000, 0.000404, 0.000000, 0.000000, 0.000840, 
+
+real	0m0.032s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+
+real	0m0.005s
+user	0m0.004s
+sys	0m0.000s
+Count = 2 file size = 1mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+0.000000, 0.000000, 0.000403, 0.000000, 0.000000, 0.000774, 
+
+real	0m0.026s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+
+real	0m0.004s
+user	0m0.003s
+sys	0m0.000s
+Count = 3 file size = 1mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+0.000000, 0.000000, 0.000424, 0.000000, 0.000000, 0.000828, 
+
+real	0m0.022s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+
+real	0m0.011s
+user	0m0.000s
+sys	0m0.004s
+Count = 4 file size = 1mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+0.000000, 0.000000, 0.000356, 0.000000, 0.000000, 0.000729, 
+
+real	0m0.024s
+user	0m0.002s
+sys	0m0.000s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+
+real	0m0.006s
+user	0m0.000s
+sys	0m0.004s
+Count = 5 file size = 1mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+0.000000, 0.000000, 0.000368, 0.000000, 0.000000, 0.000742, 
+
+real	0m0.033s
+user	0m0.000s
+sys	0m0.002s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1M virtualdisk/1mb
+
+real	0m0.015s
+user	0m0.000s
+sys	0m0.005s
+Count = 1 file size = 32mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+0.000000, 0.000000, 0.002367, 0.000000, 0.000000, 0.009429, 
+
+real	0m0.100s
+user	0m0.003s
+sys	0m0.007s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+
+real	0m0.075s
+user	0m0.000s
+sys	0m0.060s
+Count = 2 file size = 32mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+0.000000, 0.000000, 0.002219, 0.000000, 0.000000, 0.009182, 
+
+real	0m0.106s
+user	0m0.003s
+sys	0m0.007s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+
+real	0m0.073s
+user	0m0.000s
+sys	0m0.053s
+Count = 3 file size = 32mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+0.000000, 0.000000, 0.002649, 0.000000, 0.000000, 0.009633, 
+
+real	0m0.114s
+user	0m0.001s
+sys	0m0.010s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+
+real	0m0.070s
+user	0m0.004s
+sys	0m0.048s
+Count = 4 file size = 32mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+0.000000, 0.000000, 0.002445, 0.000000, 0.010000, 0.010110, 
+
+real	0m0.092s
+user	0m0.000s
+sys	0m0.011s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+
+real	0m0.067s
+user	0m0.000s
+sys	0m0.049s
+Count = 5 file size = 32mb
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+0.000000, 0.000000, 0.002289, 0.000000, 0.000000, 0.006785, 
+
+real	0m0.102s
+user	0m0.003s
+sys	0m0.005s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0  32M virtualdisk/32mb
+
+real	0m0.070s
+user	0m0.004s
+sys	0m0.049s
+Count = 1 file size = largefile
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+0.000000, 0.310000, 0.312916, 0.000000, 0.330000, 0.331036, 
+
+real	0m2.007s
+user	0m0.001s
+sys	0m0.331s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+
+real	0m2.204s
+user	0m0.012s
+sys	0m1.259s
+Count = 2 file size = largefile
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+0.000000, 0.120000, 0.129718, 0.000000, 0.190000, 0.192719, 
+
+real	0m2.147s
+user	0m0.001s
+sys	0m0.193s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+
+real	0m2.344s
+user	0m0.008s
+sys	0m1.288s
+Count = 3 file size = largefile
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+0.000000, 0.360000, 0.361641, 0.000000, 0.410000, 0.417750, 
+
+real	0m1.879s
+user	0m0.001s
+sys	0m0.418s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+
+real	0m2.360s
+user	0m0.008s
+sys	0m1.255s
+Count = 4 file size = largefile
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+0.000000, 0.330000, 0.337247, 0.000000, 0.330000, 0.337398, 
+
+real	0m2.461s
+user	0m0.001s
+sys	0m0.338s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+
+real	0m2.271s
+user	0m0.008s
+sys	0m1.243s
+Count = 5 file size = largefile
+Testing io_uring copy
+BS = 33554432 QUEUE_DEPTH = 16 
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+0.000000, 0.380000, 0.389215, 0.000000, 0.430000, 0.439063, 
+
+real	0m2.025s
+user	0m0.005s
+sys	0m0.436s
+Testing system copy
+RES PAGES SIZE FILE
+ 0B     0   1G virtualdisk/largefile
+
+real	0m2.320s
+user	0m0.004s
+sys	0m1.233s

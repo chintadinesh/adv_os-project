@@ -2,7 +2,7 @@
 
 
 
-BS=131072 
+BS=33554432 
 QUEUE_DEPTH=16
 
 #iterate through each queue deapth
@@ -10,26 +10,45 @@ QUEUE_DEPTH=16
 # Initialize counter variable
 
 # Iterate over each item
-echo "Testing io_uring copy"
 
-sudo ./bash/mountfs
-echo "BS = $BS QUEUE_DEPTH = $QUEUE_DEPTH "
-make clean
-make DEBUG=0 "BS=$BS" "QUEUE_DEPTH=$QUEUE_DEPTH"  > /dev/null 2>&1
-# Perform some action on the item
-# ...
-sudo fincore virtualdisk/largefile
-time ./bin/myucp virtualdisk/largefile virtualdisk/largefile_copy 
-time ./bin/myucp virtualdisk/largefile virtualdisk/largefile_copy 
+file_sizes=("1kb" "32kb" "1mb" "32mb" "largefile")
+#file_sizes=("1kb")
 
-sudo ./bash/umountfs
+for fl in "${file_sizes[@]}"
+do
+
+  COUNT=1
+
+  while [ $COUNT -le 5 ]
+  do
+
+    echo "Count = $COUNT file size = $fl"
+
+    echo "Testing io_uring copy"
+
+    sudo ./bash/mountfs
+    echo "BS = $BS QUEUE_DEPTH = $QUEUE_DEPTH "
+    make clean > /dev/null 2>&1
+    make DEBUG=0 "BS=$BS" "QUEUE_DEPTH=$QUEUE_DEPTH"  > /dev/null 2>&1
+    # Perform some action on the item
+    # ...
+    sudo fincore virtualdisk/${fl} 
+    time ./bin/myucp -i virtualdisk/$fl -o virtualdisk/{$fl}_copy 
+    diff virtualdisk/$fl virtualdisk/{$fl}_copy
+
+    sudo ./bash/umountfs
 
 
-echo "Testing system copy"
+    echo "Testing system copy"
 
-sudo ./bash/mountfs
-sudo fincore virtualdisk/largefile
-time cp virtualdisk/largefile virtualdisk/largefile_copy 
-time cp virtualdisk/largefile virtualdisk/largefile_copy 
+    sudo ./bash/mountfs
+    sudo fincore virtualdisk/$fl
+    time cp virtualdisk/${fl} virtualdisk/${fl}_copy 
+    diff virtualdisk/${fl} virtualdisk/${fl}_copy
 
-sudo ./bash/umountfs
+    sudo ./bash/umountfs
+
+    ((COUNT++))
+
+  done
+done
