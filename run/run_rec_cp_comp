@@ -1,0 +1,47 @@
+#!  /bin/bash
+
+
+
+BS=33554432 
+QUEUE_DEPTH=16
+
+#iterate through each queue deapth
+
+# Initialize counter variable
+
+# Iterate over each item
+
+files_dir=("smallfiles_dir" "mediumfiles_dir" "largefiles_dir" "mixfiles_dir")
+#file_sizes=("1kb")
+
+for fl in "${files_dir[@]}"
+do
+
+  COUNT=1
+
+  while [ $COUNT -le 5 ]
+  do
+
+    echo "Count = $COUNT file size = $fl"
+
+    echo "Testing io_uring copy"
+
+    sudo ./bash/mountfs
+    sudo fincore virtualdisk/$fl 
+    time ./bin/myucp -i virtualdisk/$fl -o virtualdisk/${fl}_copy 
+
+    sudo ./bash/umountfs
+
+
+    echo "Testing system copy"
+
+    sudo ./bash/mountfs
+    sudo fincore virtualdisk/$fl
+    time cp -r virtualdisk/$fl/* virtualdisk/${fl}_copy 
+
+    sudo ./bash/umountfs
+
+    ((COUNT++))
+
+  done
+done

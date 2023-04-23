@@ -1,0 +1,240 @@
+Count = 1 file size = smallfiles_dir
+Testing io_uring copy
+0.010000, 0.080000, 0.093738, 0.010000, 0.080000, 0.093842, 
+
+real    0m0.368s
+user    0m0.011s
+sys     0m0.084s
+Testing system copy
+
+real    0m0.152s
+user    0m0.020s
+sys     0m0.115s
+Count = 2 file size = smallfiles_dir
+Testing io_uring copy
+0.000000, 0.060000, 0.074903, 0.000000, 0.060000, 0.074972, 
+
+real    0m0.251s
+user    0m0.008s
+sys     0m0.069s
+Testing system copy
+
+real    0m0.145s
+user    0m0.024s
+sys     0m0.104s
+Count = 3 file size = smallfiles_dir
+Testing io_uring copy
+0.010000, 0.060000, 0.077398, 0.010000, 0.060000, 0.077491, 
+
+real    0m0.172s
+user    0m0.012s
+sys     0m0.067s
+Testing system copy
+
+real    0m0.141s
+user    0m0.025s
+sys     0m0.101s
+Count = 4 file size = smallfiles_dir
+Testing io_uring copy
+0.010000, 0.060000, 0.079965, 0.010000, 0.060000, 0.080030, 
+
+real    0m0.224s
+user    0m0.019s
+sys     0m0.063s
+Testing system copy
+
+real    0m0.176s
+user    0m0.018s
+sys     0m0.134s
+Count = 5 file size = smallfiles_dir
+Testing io_uring copy
+0.000000, 0.080000, 0.090543, 0.000000, 0.080000, 0.090616, 
+
+real    0m0.274s
+user    0m0.006s
+sys     0m0.086s
+Testing system copy
+
+real    0m0.320s
+user    0m0.025s
+sys     0m0.125s
+Count = 1 file size = mediumfiles_dir
+Testing io_uring copy
+0.010000, 0.260000, 0.282687, 0.010000, 0.260000, 0.282806, 
+
+real    0m3.235s
+user    0m0.014s
+sys     0m0.270s
+Testing system copy
+
+real    0m2.290s
+user    0m0.033s
+sys     0m1.383s
+Count = 2 file size = mediumfiles_dir
+Testing io_uring copy
+0.010000, 0.270000, 0.283436, 0.010000, 0.270000, 0.283562, 
+
+real    0m2.762s
+user    0m0.013s
+sys     0m0.272s
+Testing system copy
+
+real    0m2.044s
+user    0m0.037s
+sys     0m1.398s
+Count = 3 file size = mediumfiles_dir
+Testing io_uring copy
+0.020000, 0.260000, 0.290117, 0.020000, 0.260000, 0.290234, 
+
+real    0m2.994s
+user    0m0.026s
+sys     0m0.266s
+Testing system copy
+
+real    0m2.137s
+user    0m0.035s
+sys     0m1.406s
+Count = 4 file size = mediumfiles_dir
+Testing io_uring copy
+0.020000, 0.240000, 0.272292, 0.020000, 0.240000, 0.272388, 
+
+real    0m2.940s
+user    0m0.024s
+sys     0m0.249s
+Testing system copy
+
+real    0m2.185s
+user    0m0.042s
+sys     0m1.432s
+Count = 5 file size = mediumfiles_dir
+Testing io_uring copy
+0.010000, 0.270000, 0.291377, 0.010000, 0.270000, 0.291490, 
+
+real    0m2.865s
+user    0m0.017s
+sys     0m0.276s
+Testing system copy
+
+real    0m2.306s
+user    0m0.050s
+sys     0m1.374s
+Count = 1 file size = largefiles_dir
+Testing io_uring copy
+0.000000, 0.060000, 0.069154, 0.000000, 0.060000, 0.069234, 
+
+real    0m18.404s
+user    0m0.001s
+sys     0m0.069s
+Testing system copy
+
+real    0m2.419s
+user    0m0.012s
+sys     0m1.449s
+Count = 2 file size = largefiles_dir
+Testing io_uring copy
+0.000000, 0.180000, 0.183012, 0.000000, 0.180000, 0.183105, 
+
+real    0m2.859s
+user    0m0.001s
+sys     0m0.184s
+Testing system copy
+
+real    0m2.109s
+user    0m0.000s
+sys     0m1.428s
+Count = 3 file size = largefiles_dir
+Testing io_uring copy
+0.000000, 0.160000, 0.167930, 0.000000, 0.160000, 0.168018, 
+
+real    0m2.515s
+user    0m0.001s
+sys     0m0.169s
+Testing system copy
+
+real    0m2.100s
+user    0m0.016s
+sys     0m1.324s
+Count = 4 file size = largefiles_dir
+Testing io_uring copy
+0.000000, 0.160000, 0.165831, 0.000000, 0.160000, 0.165932, 
+
+real    0m2.710s
+user    0m0.004s
+sys     0m0.163s
+Testing system copy
+
+real    0m2.038s
+user    0m0.032s
+sys     0m1.339s
+Count = 5 file size = largefiles_dir
+Testing io_uring copy
+0.000000, 0.170000, 0.176891, 0.000000, 0.170000, 0.176985, 
+
+real    0m2.528s
+user    0m0.000s
+sys     0m0.178s
+Testing system copy
+
+real    0m2.319s
+user    0m0.004s
+sys     0m1.347s
+Count = 1 file size = mixfiles_dir
+Testing io_uring copy
+0.000000, 0.130000, 0.135349, 0.000000, 0.130000, 0.135429, 
+
+real    0m50.036s
+user    0m0.005s
+sys     0m0.132s
+Testing system copy
+
+real    0m54.667s
+user    0m0.072s
+sys     0m4.443s
+Count = 2 file size = mixfiles_dir
+Testing io_uring copy
+0.000000, 0.340000, 0.348735, 0.000000, 0.340000, 0.348836, 
+
+real    0m23.934s
+user    0m0.005s
+sys     0m0.346s
+Testing system copy
+
+real    0m22.307s
+user    0m0.036s
+sys     0m2.186s
+Count = 3 file size = mixfiles_dir
+Testing io_uring copy
+0.000000, 0.290000, 0.301173, 0.000000, 0.290000, 0.301274, 
+
+real    0m22.734s
+user    0m0.004s
+sys     0m0.299s
+Testing system copy
+
+real    0m22.890s
+user    0m0.010s
+sys     0m2.172s
+Count = 4 file size = mixfiles_dir
+Testing io_uring copy
+0.000000, 0.340000, 0.344998, 0.000000, 0.340000, 0.345108, 
+
+real    0m24.641s
+user    0m0.004s
+sys     0m0.343s
+Testing system copy
+
+real    0m22.626s
+user    0m0.016s
+sys     0m2.197s
+Count = 5 file size = mixfiles_dir
+Testing io_uring copy
+0.000000, 0.330000, 0.336312, 0.000000, 0.330000, 0.336418, 
+
+real    0m23.146s
+user    0m0.001s
+sys     0m0.337s
+Testing system copy
+
+real    0m22.158s
+user    0m0.029s
+sys     0m2.162s

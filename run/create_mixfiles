@@ -1,0 +1,35 @@
+#!  /bin/bash
+
+# Initialize counter variable
+COUNT=1
+
+#sudo bash/mountfs
+
+# Iterate over each item
+while [ $COUNT -le 50 ]
+do
+  sudo dd if=/dev/random of=virtualdisk/mixfiles_dir/1k_$COUNT bs=1K count=1
+  ((COUNT++))
+done
+
+# Initialize counter variable
+COUNT=1
+while [ $COUNT -le 50 ]
+do
+  sudo dd if=/dev/random of=virtualdisk/mixfiles_dir/32k_$COUNT bs=1K count=32
+  ((COUNT++))
+done
+
+COUNT=1
+while [ $COUNT -le 50 ]
+do
+  sudo dd if=/dev/random of=virtualdisk/mixfiles_dir/1m_$COUNT bs=1M count=1
+  ((COUNT++))
+done
+
+COUNT=1
+while [ $COUNT -le 50 ]
+do
+  sudo dd if=/dev/random of=virtualdisk/mixfiles_dir/32m_$COUNT bs=1M count=32
+  ((COUNT++))
+done

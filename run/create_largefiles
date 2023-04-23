@@ -1,0 +1,15 @@
+#!  /bin/bash
+
+# Initialize counter variable
+COUNT=1
+
+#sudo bash/mountfs
+
+# Iterate over each item
+while [ $COUNT -le 32 ]
+do
+  sudo dd if=/dev/random of=virtualdisk/largefiles_dir/$COUNT bs=1M count=32
+  ((COUNT++))
+done
+
+#sudo bash/umountfs
