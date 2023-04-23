@@ -57,3 +57,10 @@ sudo losetup -d /dev/loop40
 ```
 sudo fincore /path/to/file
 ```
+
+### It's not fair to use time utility
+It is easy to note that closing the file takes much longer than the file-io.
+Hence, we the "real" time of the program is much higher.
+To avoid, we add user + system time for the programs. We can note that user + system time is 
+clse to the reported times of user + system time.
+
