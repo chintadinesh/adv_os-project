@@ -120,6 +120,7 @@ int copy_file(struct io_fop *fop) {
             data = io_uring_cqe_get_data(cqe); //unpack the data
             if (cqe->res < 0) { // some error
                 if (cqe->res == -EAGAIN) { // interesting. 
+                    DEBUG("cqe->res = -EAGAIN\n");
                     queue_prepped(ring, data); // TODO: Not sure what this does
                     io_uring_cqe_seen(ring, cqe); // ack the data
                     continue; // TODO: I thought this would be a break
@@ -129,11 +130,21 @@ int copy_file(struct io_fop *fop) {
                 exit(EXIT_FAILURE); 
             } 
             else if (cqe->res != data->iov.iov_len) { // a smaller read/write
+                DEBUG("cqe->res = %d != data->iov.iov_len = %d\n", cqe->res, data->iov.iov_len);
+
                 /* short read/write; adjust and requeue */
                 data->iov.iov_base += cqe->res; // TODO: What is the role of iov?
                 data->iov.iov_len -= cqe->res;
                 queue_prepped(ring, data); 
                 io_uring_cqe_seen(ring, cqe);
+                if(reads == 0 && insize == 0){
+                    DEBUG("no more reads left. Hence resubmitting the write\n");
+                    ret = io_uring_submit(ring); // submit a write of the data
+                    if (ret < 0) {
+                        fprintf(stderr, "io_uring_submit: %s\n", strerror(-ret));
+                        break;
+                    }
+                }
                 continue;
             }
 
