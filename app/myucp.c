@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
         pring = (struct io_uring *)malloc(sizeof(struct io_uring));
 
 #ifdef POLL
-        if (setup_context(QUEUE_DEPTH, pring, IORING_SETUP_IOPOLL ))
+        if (setup_context(QUEUE_DEPTH, pring, IORING_SETUP_IOPOLL | IORING_SETUP_SQPOLL ))
 #else
         if (setup_context(QUEUE_DEPTH, pring, 0))
 #endif

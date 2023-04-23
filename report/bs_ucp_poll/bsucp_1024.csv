@@ -1,0 +1,13 @@
+cqe failed: Operation not supported
+losetup: virtualdisk/vdisk.img: failed to set up loop device: No such file or directory
+mount: /home/dinesh/work/adv_os/adv_os-project/virtualdisk: /dev/loop40 already mounted on /home/dinesh/work/adv_os/adv_os-project/virtualdisk.
+mount: Success
+losetup: virtualdisk/vdisk.img: failed to set up loop device: No such file or directory
+mount: /home/dinesh/work/adv_os/adv_os-project/virtualdisk: /dev/loop40 already mounted on /home/dinesh/work/adv_os/adv_os-project/virtualdisk.
+mount: Success
+losetup: virtualdisk/vdisk.img: failed to set up loop device: No such file or directory
+mount: /home/dinesh/work/adv_os/adv_os-project/virtualdisk: /dev/loop40 already mounted on /home/dinesh/work/adv_os/adv_os-project/virtualdisk.
+mount: Success
+losetup: virtualdisk/vdisk.img: failed to set up loop device: No such file or directory
+mount: /home/dinesh/work/adv_os/adv_os-project/virtualdisk: /dev/loop40 already mounted on /home/dinesh/work/adv_os/adv_os-project/virtualdisk.
+mount: Success

@@ -15,9 +15,9 @@
 
 extern struct opts opts;
 
+char buffer[BS];
 int copy_file(FILE *src, FILE *dst)
 {
-    char buffer[BS];
     size_t bytesRead, bytesWritten;
     DEBUG("args: src dst\n");
 
@@ -38,22 +38,29 @@ int main(int argc, char **argv) {
     FILE *src, *dst;
     int ret;
 
-    if(ret = system_mount()){
-        perror("mount");
-        exit(1);
+
+    parse_opts(argc, argv);
+    print_opts();
+
+    if(opts.opt_testing){
+        WARNING("mounting the fs\n");
+        if(ret = system_mount()){
+            perror("mount");
+            exit(1);
+        }
     }
 
     start_timer();
 
-    PRINT_ARGS();
-
-    src = fopen(argv[1], "rb");  // Open source file for reading in binary mode
+    DEBUG("opening the file %s\n", opts.opt_input_path);
+    src = fopen(opts.opt_input_path, "rb");  // Open source file for reading in binary mode
     if (src == NULL) {
         perror("Failed to open source file");
         return 1;
     }
 
-    dst = fopen(argv[2], "wb");  // Open destination file for writing in binary mode
+    DEBUG("opening dst file %s\n", opts.opt_output_path);
+    dst = fopen(opts.opt_output_path, "wb");  // Open destination file for writing in binary mode
     if (dst == NULL) {
         perror("Failed to open destination file");
         fclose(src);
@@ -61,6 +68,7 @@ int main(int argc, char **argv) {
     }
 
     for(int i = 0; i < 1; i++){
+        DEBUG("Calling file copy\n");
         if(copy_file(src, dst))
             perror("copy file");
         else
@@ -94,6 +102,7 @@ int main(int argc, char **argv) {
     fclose(dst);
 
     print_timer();
+
     fprintf(stderr, "\n");
 
     if(opts.opt_testing){
