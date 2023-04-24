@@ -21,18 +21,18 @@
 \begin{document}
 \maketitle
 \section{Abstract}
-With More’s Law scaling slowing, the hardware trends moved towards parallelism, highlighting the need for asynchronous 
-system calls to harness the performance benefits of parallel hardware. IO\_URING is a simple-to-use interface introduced 
-in the Linux Kernels 5.1 and is being rapidly adopted for various IO applications -- network and block. In this report, 
+With Moore's Law scaling slowing, the hardware trends moved towards parallelism, necessitating the need for asynchronous 
+system calls to harness the performance benefits of parallel hardware. IO\_URING is a simple-to-use 
+interface copared to other existing interfaces like "aio" introduced in the Linux Kernels 5.1 and 
+is being rapidly adopted for various IO applications -- network and block. In this report, 
 we show the efficacy of IO\_URING in file-copy utilities by improving the performance in terms of time taken to complete the 
 task by around 88\% when recursively copying files in a directory and about 80\% when copying medium-sized files of 32MB each 
 and 72\% when copying large files of size 1GB.
 
 \section{IO\_URING}
 
-IO\_URINGis an I/O interface designed to provide a more efficient way of handling I/O operations, especially in highly 
-parallel workloads, which has become increasingly crucial as Moore's Law has slowed and parallel hardware has become more 
-prevalent.
+IO\_URING is an I/O interface designed to provide a more efficient way of handling I/O operations, especially in highly 
+parallel workloads.
 
 Here are some of the key advantages of IO\_URING:
 \begin{itemize}
@@ -87,13 +87,14 @@ Whenever we wanted to ensure that the file was not in the page cache, we used th
 file blocks in RAM.
 
 
-\section{Understanding metrics }
+\section{Understanding metrics}
 \subsection{Latency}
 Latency is one metric to understand the end-to-end delay of an operation to a device. Studies on this would expose the critical 
 path latency and isolate the impact of payload size while copying.
 
-As shown in the pseudocode, our measured latency is the time it takes for the read system call to return in the case of the 
-synchronous option, and in the case of IO\_URING, it is the time for the submitted READ\_OP to appear in the "wait" system call. 
+As shown in Listings3, our measured latency is the time it takes for the read system call to return in the case of the 
+synchronous option, and in the case of IO\_URING, it is the time for the submitted IO\_URING\_READ\_OP to appear in the 
+CompletionQueue so that the "wait" call finishes. 
 
 It should be noted that our latency is not a completion latency. The completion latency can be much higher for both io\_uring 
 and synchronous operations. This latency measure would emphasize the system's responsiveness rather than the throughput. 
@@ -118,7 +119,7 @@ int latency_main(int argc, char **argv) {
 
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.4]{latency.png}
+    \includegraphics[scale = 0.3]{latency.png}
     \caption{4K block random read latency comparision between synchronous
     and io\_uring where
     sync\_dir: synchronous O\_DIRECT enabled access;
@@ -129,7 +130,8 @@ int latency_main(int argc, char **argv) {
     \label{Figure1}
 \end{figure}
 
-The Latency of io\_uring is in the order of a few microseconds. However, as noted in the figure, the Latency of the synchronous 
+From Figure1. we can notice that the Latency of io\_uring is in the order of a few microseconds. 
+However, the Latency of the synchronous 
 read is anywhere between a few tens of microseconds to a few milliseconds. There is 3 orders of magnitude in difference. 
 One possible explanation for the high variance in Latency in the case of synchronous operation is context switches. 
 
@@ -142,7 +144,7 @@ behavior.
 \subsection{IOPS}
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.4]{iops.png}
+    \includegraphics[scale = 0.3]{iops.png}
     \caption{4K-block random read IOPS comparision batween synchronous 
     and io\_uring where
     sync\_rand\_dir: synchronous random O\_DIRECT enabled access;
@@ -155,8 +157,11 @@ behavior.
     }
     \label{Figure2}
 \end{figure}
-The number of Input Output Operations per Second is defined as IOPS. It captures performance regarding the number of operations 
-seen from userspace. We compared the performance of read operations of 4K block size in a large file of 1GB between the 
+The number of Input Output Operations per Second is defined as 
+\href{IOPS}{https://en.wikipedia.org/wiki/IOPS}. 
+It captures performance regarding the number of operations 
+seen from userspace. We compared the performance of read operations of 4K block size while accessing a 
+large file of 1GB between the 
 synchronous and asynchronous version using IO\_URING with different options concerning sequential vs random, with or without 
 O\_DIRECT flag set, the impact of POLLING for IO\_URING. The results are plotted in Figure 2.
 
@@ -167,7 +172,7 @@ As expected, sequential read performance is higher than random read for synchron
 IO\_URING, the throughput of random access is slightly higher (or insignificant). This again requires further investigation to 
 determine the reasons.
 
-We expected POLLING to increase the throughput of IO\_URING. We used both IORING\_SETUP\_IOPOLL and IORING\_SETUP\_SQPOLL flags 
+The impact of POLLING is contrary to our expectation of increased throughput. We used both IORING\_SETUP\_IOPOLL and IORING\_SETUP\_SQPOLL flags 
 while opening the files. IORING\_SETUP\_IOPOLL is used to enable the io-polling mechanism in io\_uring. With this flag, the kernel 
 will use a busy-wait loop to poll for completions instead of relying on an eventfd-based notification mechanism. This can improve 
 the application's performance by reducing the overhead of system calls.
@@ -204,7 +209,7 @@ difference for a fixed QUEUE\_DEPTH in Figure2 as represented by rectangles “i
 
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.3]{queue_depth.png}
+    \includegraphics[scale = 0.4]{queue_depth.png}
     \caption{Impact of Queue Depth for POLLED IO\_URING while performing 4K block random reads in terms of 
     IOPS comparing sequential and random access for QUEUE\_DEPTHS ranging from 1 to 256.}
     \label{Figure3}
@@ -213,7 +218,7 @@ difference for a fixed QUEUE\_DEPTH in Figure2 as represented by rectangles “i
 \subsection{Block Size}
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.3]{cp_bs.png}
+    \includegraphics[scale = 0.4]{cp_bs.png}
     \caption{IO\_URING copy real, system, and user time for block sizes of 1KB to 32MB when copying 
     1GB file with a QUEUE\_DEPTH of 16.}
     \label{Figure5}
@@ -221,13 +226,13 @@ difference for a fixed QUEUE\_DEPTH in Figure2 as represented by rectangles “i
 
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.3]{cp_qd.png}
+    \includegraphics[scale = 0.4]{cp_qd.png}
     \caption{IO\_URING copy completion-time comparision for copying a 1GB file with across BLOCK\_SIZES 
     of 1KB, 32KB, 1MB and 32MB with QUEUE\_SIZES ranging from 1 to 256.}
     \label{Figure4}
 \end{figure}
 
-Undrestanding the impact of BLOCK\_SIZE requires an experiment invole a throughput metric. — IOPS and latency are not sufficient. 
+Undrestanding the impact of BLOCK\_SIZE requires an experiment invole a throughput metric — IOPS and latency are not sufficient. 
 Hence, we used completion time as the metric to analyze the impact. We experimented with 4 different blocks sizes, 1KB, 32KB, 
 1MB, and 32MB for this.
 
@@ -255,7 +260,7 @@ actual data transfer.
 
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.5]{cp_perf_compare.png}
+    \includegraphics[scale = 0.6]{cp_perf_compare.png}
     \caption{File Copy completion-time comparison between uring-cp and system-cp for file sizes
     1KB, 32KB, 1MB, 32MB, and 1GB when IO\_URING's BLOCK\_SIZE is 32MB and QUEUE\_DEPTH is 16.}
     \label{Figure6}
@@ -288,7 +293,7 @@ and system-cp('\_s'); completion times under 'io\_uring' and 'system\_cp'; perce
 
 \begin{figure}
     \centering
-    \includegraphics[scale = 0.5]{cp_perf_recursive_compare.png}
+    \includegraphics[scale = 0.6]{cp_perf_recursive_compare.png}
     \caption{Recursive File Copy Completion times comparison between uring-cp and system-cp for directories containing, 
     smallfiles\_dir - 1000 32KB files; 
     mediumfiles\_dir - 1000 1MB files; 
