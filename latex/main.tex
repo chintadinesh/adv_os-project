@@ -271,7 +271,7 @@ actual data transfer.
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 
     \hline
-    file\_size & user\_u & system\_u & user\_s & system\_s & io\_uring & system\_cp & percent \\
+    file\_size & user\_u & system\_u & user\_s & system\_s & io\_uring & system\_cp & percent decrement\\
     \hline
     1KB    &   0.0015  & 0.0000 &0.00125 &  0.0005  & 0.0015 &  0.00175 &14.28 \\
     \hline
@@ -279,7 +279,7 @@ actual data transfer.
     \hline
     1MB    &   0.0016  & 0.0004 &0.00140 &  0.0026  & 0.0020 &  0.00400 &50.00 \\
     \hline
-    32MB   &   0.0020  & 0.0080 &0.00160 &  0.0518  & 0.0100 &  0.05340 &81.27 \\
+    32MB   &   0.0020  & 0.0080 &0.00160 &  0.0518  & 0.0100 &  0.05340 &\textbf{81.27} \\
     \hline
     1GB    &   0.0018  & 0.3432 &0.00800 &  1.2556  & 0.3450 &  1.26360 &72.69 \\
     \hline
@@ -287,7 +287,7 @@ actual data transfer.
 \end{tabular}
 \caption{\label{tab:widgets}A table of Execution times in terms of user and system times for uring-cp('\_u') 
 and system-cp('\_s'); completion times under 'io\_uring' and 'system\_cp'; percentage decrement under 
-'percent' columns.}
+'percent decrement' columns.}
 \vspace{0.5cm}
 \end{table}
 
@@ -307,22 +307,22 @@ and system-cp('\_s'); completion times under 'io\_uring' and 'system\_cp'; perce
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 
     \hline
-    file\_size & user\_u & system\_u & user\_s & system\_s & io\_uring & system\_cp & percent \\
+    file\_size & user\_u & system\_u & user\_s & system\_s & io\_uring & system\_cp & percent decrement\\
     \hline                                                                                        
     smallfiles\_dir  &0.01125 & 0.07125& 0.0230 &  0.1160  & 0.0825 &   0.1390  &  40.64\\
     \hline                                                                                        
     mediumfiles\_dir &0.01880 & 0.26660& 0.0394 &  1.3986  & 0.2854 &   1.4380  &  80.15\\
     \hline                                                                                        
-    largefiles\_dir  &0.00140 & 0.15260& 0.0128 &  1.3774  & 0.1540 &   1.3902  &  88.92\\
+    largefiles\_dir  &0.00140 & 0.15260& 0.0128 &  1.3774  & 0.1540 &   1.3902  &  \textbf{88.92}\\
     \hline                                                                                        
-    mixfiles\_dir    &0.00380 & 0.29140& 0.0326 &  2.6320  & 0.2952 &   2.6646  &  88.92\\
+    mixfiles\_dir    &0.00380 & 0.29140& 0.0326 &  2.6320  & 0.2952 &   2.6646  &  \textbf{88.92}\\
     \hline                                                                                        
      
 \end{tabular}
 \caption{\label{tab:widgets}A table of Execution times of recursive copy 
 in terms of user and system times for uring-cp('\_u') 
 and system-cp('\_s'); completion times under 'io\_uring' and 'system\_cp'; percentage decrement under 
-'percent' columns.}
+'percent decrement' columns.}
 \vspace{0.5cm}
 \end{table}
 
